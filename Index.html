@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garibaldi: La Spedizione dei Mille</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #121418;
+      background-image: radial-gradient(circle at 50% 20%, #1e2430 0%, #121418 70%, #0a0c10 100%);
+      color: #f1f3f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px 40px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* App Header / Brand */
+    .app-header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .app-title-main {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #f0b969;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .app-subtitle {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Card Cardinale */
+    .game-card {
+      width: 100%;
+      background-color: #1b1f28;
+      border: 1px solid #2d3548;
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dynamic Themes for Insight / Paradox */
+    .game-card.theme-insight {
+      background-color: #14281e;
+      border-color: #27563d;
+    }
+
+    .game-card.theme-paradox {
+      background-color: #2c1515;
+      border-color: #592525;
+    }
+
+    /* Home Hero Image */
+    .hero-image-box {
+      width: 100%;
+      height: 200px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid #364156;
+      background: #0f1218;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    /* Breadcrumb Thread */
+    .thread-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .thread-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .thread-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: #2a3245;
+      border: 2px solid #3c4860;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #94a3b8;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .thread-dot.status-green {
+      background-color: #1b4d31;
+      border-color: #2ecc71;
+      color: #2ecc71;
+    }
+
+    .thread-dot.status-yellow {
+      background-color: #5c4b16;
+      border-color: #f1c40f;
+      color: #f1c40f;
+    }
+
+    .thread-dot.status-red {
+      background-color: #5c1d1d;
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+
+    .thread-dot.current {
+      box-shadow: 0 0 0 3px rgba(240, 185, 105, 0.3);
+      border-color: #f0b969;
+      color: #f0b969;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      border: 1px solid transparent;
+    }
+
+    .badge-story { color: #cbd5e1; background-color: #262e3d; border-color: #3b465e; }
+    .badge-decision { color: #f0b969; background-color: #3a2e1c; border-color: #70562e; }
+    .badge-paradox { color: #f87171; background-color: #451a1a; border-color: #7f2727; }
+    .badge-insight { color: #4ade80; background-color: #143825; border-color: #226e45; }
+    .badge-epilogue { color: #f0b969; background-color: #3a2e1c; border-color: #70562e; }
+
+    .node-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+
+    .node-text {
+      color: #d1d5db;
+      font-size: 1.04rem;
+      margin-bottom: 24px;
+      word-wrap: break-word;
+    }
+
+    /* Debrief Box */
+    .debrief-box {
+      background-color: #1b0e0e;
+      border: 1px solid #592525;
+      border-left: 4px solid #ef4444;
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+    }
+
+    .debrief-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f87171;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .debrief-text {
+      font-size: 0.95rem;
+      color: #fca5a5;
+      line-height: 1.5;
+    }
+
+    /* Highlights */
+    .hl-gold {
+      color: #f0b969;
+      border-bottom: 1px dashed #f0b969;
+    }
+
+    .hl-persona {
+      color: #38bdf8;
+      border-bottom: 1px dashed #38bdf8;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .hl-persona:hover {
+      color: #7dd3fc;
+    }
+
+    /* Icon Navigation Button (Bottom) */
+    .btn-icon-next {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      margin-left: auto;
+      background-color: #f0b969;
+      color: #121418;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(240, 185, 105, 0.35);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-icon-next:hover {
+      background-color: #f4c682;
+      transform: scale(1.05);
+    }
+
+    .btn-icon-next svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Choices List with Chromatic Differentiation */
+    .choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-choice {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      width: 100%;
+      padding: 16px;
+      font-family: inherit;
+      font-size: 0.98rem;
+      line-height: 1.45;
+      color: #f1f3f7;
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-choice:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Option A: Distinct Theme (Indigo/Slate accent) */
+    .btn-choice.option-a {
+      background-color: #202636;
+      border: 1px solid #3b4663;
+    }
+    .btn-choice.option-a:hover {
+      border-color: #60a5fa;
+      background-color: #252e42;
+    }
+    .btn-choice.option-a .choice-key {
+      background-color: #151922;
+      color: #60a5fa;
+      border-color: #3b4663;
+    }
+
+    /* Option B: Distinct Theme (Amber/Bronze accent) */
+    .btn-choice.option-b {
+      background-color: #2b241c;
+      border-color: #5c472b;
+    }
+    .btn-choice.option-b:hover {
+      border-color: #f0b969;
+      background-color: #362e22;
+    }
+    .btn-choice.option-b .choice-key {
+      background-color: #1a1611;
+      color: #f0b969;
+      border-color: #5c472b;
+    }
+
+    .choice-key {
+      flex-shrink: 0;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: 1px solid;
+      border-radius: 8px;
+      padding: 4px 10px;
+      margin-top: 1px;
+    }
+
+    /* Persona Modal - Deep Blue Premium Theme */
+    .overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(8, 11, 18, 0.82);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .overlay-backdrop.active {
+      display: flex;
+    }
+
+    .persona-modal {
+      width: 100%;
+      max-width: 440px;
+      background-color: #0f1a2e; /* Deep Blue background */
+      border: 1px solid #1e3a68;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.8), 0 0 15px rgba(56, 189, 248, 0.15);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .persona-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #1e3a68;
+    }
+
+    .persona-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #38bdf8;
+      line-height: 1.2;
+    }
+
+    .persona-close {
+      background: #172a4d;
+      border: 1px solid #2b4c82;
+      color: #93c5fd;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .persona-close:hover {
+      background: #1e3a68;
+      color: #fff;
+    }
+
+    .persona-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .persona-field {
+      background: #0a101d;
+      border: 1px solid #172a4d;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .persona-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7dd3fc;
+      margin-bottom: 3px;
+    }
+
+    .persona-value {
+      font-size: 0.94rem;
+      color: #e2e8f0;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="app-header">
+      <h1 class="app-title-main">Garibaldi • I Mille</h1>
+      <div class="app-subtitle">Interactive Historical Adventure</div>
+    </div>
+
+    <main class="game-card" id="app-card" aria-live="polite"></main>
+  </div>
+
+  <!-- Persona Modal (Deep Blue) -->
+  <div class="overlay-backdrop" id="persona-overlay" role="dialog" aria-modal="true" aria-labelledby="persona-title">
+    <div class="persona-modal">
+      <div class="persona-header">
+        <h2 class="persona-name" id="persona-title"></h2>
+        <button type="button" class="persona-close" id="persona-close-btn" aria-label="Chiudi scheda">×</button>
+      </div>
+      <div class="persona-body" id="persona-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const GAME_DATA = {
+      "title": "La Spedizione dei Mille e la Proclamazione del Regno (1860-1861)",
+      "nodes": [
+        {
+          "id": "intro",
+          "type": "intro",
+          "title": "Lo Scoglio di Quarto",
+          "text": "Io, ~persona~Giuseppe Garibaldi~, stringo il parapetto umido dello ~nozione~Scoglio dei Mille~ a Quarto, davanti a Villa Spinola. È la notte tra il ~data~5-6 Maggio 1860~. Dietro di me milleottantanove volontari in camicia rossa caricano casse in silenzio. Non abbiamo corazzate: ci attendono solo due piroscafi e fucili obsoleti per sfidare i novantamila soldati regolari del Regno delle Due Sicilie. I mazziniani Francesco Crispi e Rosolino Pilo hanno preparato l'insurrezione in Sicilia, ma io punto a unificare l'Italia sotto la corona sabauda. Il mare nero ci aspetta: salpiamo nell'ombra prima che la diplomazia ci fermi.",
+          "next": "story_1"
+        },
+        {
+          "id": "story_1",
+          "type": "story",
+          "title": "La Trappola Diplomatica (MACRO)",
+          "text": "A Torino il primo ministro ~persona~Camillo Benso, Conte di Cavour~ osserva la nostra mossa con fredda ambiguità: considera la spedizione rischiosa, teme lo scontro con la Francia e aspetta un mio passo falso per sconfessarmi. Intanto a Napoli il giovane re ~persona~Francesco II di Borbone~, salito al trono nel 1859, schiera la flotta regia nel Tirreno. Dopo aver recuperato a Talamone ~nozione~tre vecchi cannoni~ e cento fucili, navighiamo a luci spente. Sul ponte del Lombardo sventola nel vento salmastro la nostra bandiera tricolore italiana.",
+          "next": "story_2"
+        },
+        {
+          "id": "story_2",
+          "type": "story",
+          "title": "Collisione nel Buio (MICRO)",
+          "text": "Proprio quella ~nozione~bandiera tricolore~ scompare nella tenebra fitta sul mare aperto. Sul mio piroscafo il piccolo ~persona~Giuseppe Marchetti~, dieci anni appena, trema accanto al padre medico Luigi stringendo la camicia rossa troppo larga sui pantaloni consumati. All'improvviso la prua nera del Lombardo taglia le onde dritta contro il nostro fianco. Al timone ~persona~Nino Bixio~, accecato dal buio e dalla sua furia impulsiva, ci ha scambiati per una fregata borbonica e sta per speronarci.",
+          "next": "decision_1"
+        },
+        {
+          "id": "decision_1",
+          "type": "decision",
+          "decisionIndex": 0,
+          "text": "Se accendo i fanali o lascio fare a Nino Bixio, mentre la prua del piroscafo Lombardo incombe a pochi metri dallo scafo nella notte del 6 Maggio 1860, in pochi istanti rischiamo il naufragio.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Accendo i fanali di bordo e sparo un colpo dei tre vecchi cannoni di Talamone per segnalare la posizione.",
+              "target": "paradox_1"
+            },
+            {
+              "id": "b",
+              "text": "Mantengo il buio totale e grido a squarciagola dal ponte per fermare la manovra di Bixio.",
+              "target": "insight_1"
+            }
+          ]
+        },
+        {
+          "id": "paradox_1",
+          "type": "paradox",
+          "text": "Il lampo del vecchio cannone di ~nozione~Talamone~ illumina tutto il Tirreno come un fuoco d'artificio di sagra. ~persona~Nino Bixio~ frena in tempo, ma tre fregate di ~persona~Francesco II di Borbone~ ci avvistano e ci rimorchiano a Genova senza sparare un colpo.",
+          "debrief": "I Mille non viaggiavano su corazzate militari scortate dalla Marina sabauda, ma su due piroscafi mercantili in navigazione clandestina a luci spente: farsi scoprire dalle navi regie significava il fallimento immediato della spedizione. Garibaldi evitò lo scontro gridando nel buio dal ponte.",
+          "foldback": "decision_1"
+        },
+        {
+          "id": "insight_1",
+          "type": "insight",
+          "text": "Mi sporgo dal parapetto e ruggisco nel vento: «Capitan ~persona~Nino Bixio~, volete mandarmi a fondo?». Bixio riconosce la mia voce, vira di colpo e le murate si sfiorano appena nella schiuma. Non viaggiavamo su corazzate scortate dalla Marina sabauda, ma su due vapori civili al buio: solo la prontezza di comando ha salvato la ~evento~Spedizione dei Mille~ dal naufragio.",
+          "next": "story_3"
+        },
+        {
+          "id": "story_3",
+          "type": "story",
+          "title": "Il Mistero di Marsala (MACRO)",
+          "text": "L'~data~11 Maggio 1860~ le coste della Sicilia emergono all'orizzonte davanti al porto di Marsala. Un colpo di fortuna strategico ci apre la porta dell'isola: i soldati borbonici hanno lasciato la città ieri per marciare verso Palermo. Inoltre, la presenza in rada di ~nozione~navi da guerra inglesi~ frena per ore i vascelli di ~persona~Francesco II di Borbone~, costretti a manovrare per non colpire i legni britannici. Ma appena tocchiamo il molo, i vapori napoletani aprono il fuoco sulle casse di polvere.",
+          "next": "story_4"
+        },
+        {
+          "id": "story_4",
+          "type": "story",
+          "title": "Sotto le Cannonate (MICRO)",
+          "text": "Le pesanti ~nozione~casse di polvere da sparo~ restano scoperte sulla banchina mentre le palle di cannone sollevano colonne d'acqua e pietre. ~persona~Luigi Marchetti~ cerca di riparare il materiale sanitario, ma suo figlio ~persona~Giuseppe Marchetti~ corre verso il molo con la camicia rossa rimboccata sopra i pantaloni rotti. Accanto a lui, decine di contadini siciliani spingono i loro carretti di legno fino alla spiaggia per aiutarci a salvare le munizioni sotto il bombardamento.",
+          "next": "decision_2"
+        },
+        {
+          "id": "decision_2",
+          "type": "decision",
+          "decisionIndex": 1,
+          "text": "Mentre i vapori borbonici aggiustano il tiro sul molo di Marsala l'11 Maggio 1860 e una sola scintilla può far saltare la polvere da sparo, Giuseppe Marchetti e i contadini attendono un mio ordine.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Accetto l'aiuto del piccolo Giuseppe e dei carretti dei contadini siciliani per svuotare subito il molo.",
+              "target": "insight_2"
+            },
+            {
+              "id": "b",
+              "text": "Allontano il bambino e i carretti dei civili dal porto e attendo il buio per scaricare le casse da soli.",
+              "target": "paradox_2"
+            }
+          ]
+        },
+        {
+          "id": "paradox_2",
+          "type": "paradox",
+          "text": "Mando tutti a dormire al sicuro, ma le ~nozione~casse di polvere da sparo~ restano sul molo sotto gli spruzzi delle onde. A mezzanotte abbiamo salvato la pelle, però la polvere è così bagnata che i nostri ~nozione~fucili obsoleti~ sparano solo bolle di sapone.",
+          "debrief": "Lo sbarco a Marsala dell'11 maggio 1860 riuscì perché le truppe borboniche avevano lasciato la città il giorno prima per Palermo e perché la popolazione locale, insieme a giovanissimi volontari come ~persona~Giuseppe Marchetti~, caricò subito sui carretti le munizioni sotto il tiro navale.",
+          "foldback": "decision_2"
+        },
+        {
+          "id": "insight_2",
+          "type": "insight",
+          "text": "Affido le casse alle braccia di ~persona~Giuseppe Marchetti~ e ai ~nozione~carretti dei contadini~ siciliani, mettendo in salvo ogni granello di polvere prima che il tiro nemico ci inquadri. A Marsala non abbiamo affrontato un esercito schierato sul molo, ma vinto una corsa contro il tempo grazie al sostegno immediato della popolazione locale durante lo ~evento~Sbarco a Marsala~.",
+          "next": "story_5"
+        },
+        {
+          "id": "story_5",
+          "type": "story",
+          "title": "La Collina di Calatafimi (MACRO)",
+          "text": "Al bivacco dopo lo sbarco passo in maniche di camicia tra i volontari, mentre ~persona~Giuseppe Marchetti~ mangia davanti al fuoco un pezzo di pane regalatogli da una vecchietta. La marcia verso l'interno ci porta il ~data~15 Maggio 1860~ davanti alle alture di Calatafimi. Il generale borbonico ~persona~Francesco Landi~ domina i pendii con truppe regolari fresche e ben armate. A noi si uniscono cinquecento insorti siciliani dei Cacciatori dell'Etna, ma i nostri vecchi fucili hanno ormai pochissime cartucce.",
+          "next": "story_6"
+        },
+        {
+          "id": "story_6",
+          "type": "story",
+          "title": "Gradini di Fuoco (MICRO)",
+          "text": "Le ultime ~nozione~cartucce di piombo~ bruciano nelle giberne sotto il sole a picco. Sul fianco della collina ~persona~Giuseppe La Masa~ sventola la sciabola per tenere uniti i suoi indisciplinati Cacciatori dell'Etna, mentre i battaglioni regolari di ~persona~Francesco Landi~ scaricano salve precise dall'alto delle terrazze. Nino Bixio mi affianca col volto annerito dal fumo e la voce roca: «Generale, i fucili sono scarichi, se restiamo fermi qui sotto ci schiacciano come bersagli!».",
+          "next": "decision_3"
+        },
+        {
+          "id": "decision_3",
+          "type": "decision",
+          "decisionIndex": 2,
+          "text": "Con le munizioni esaurite sotto il fuoco incrociato delle truppe di Francesco Landi il 15 Maggio 1860, se sbagliamo mossa su questo pendio scosceso l'intera spedizione verrà spazzata via in pochi minuti.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ordino la ritirata tattica dietro i Cacciatori dell'Etna per risparmiare la vita dei volontari.",
+              "target": "paradox_3"
+            },
+            {
+              "id": "b",
+              "text": "Innesto le baionette e guido la carica frontale in salita a petto scoperto fino alla vetta.",
+              "target": "insight_3"
+            }
+          ]
+        },
+        {
+          "id": "paradox_3",
+          "type": "paradox",
+          "text": "Il ripiegamento spezza subito lo slancio dei ~nozione~Cacciatori dell'Etna~ di ~persona~Giuseppe La Masa~, che vedono le Camicie Rosse arretrare e si disperdono nelle campagne. Il generale ~persona~Francesco Landi~ ordina allora la discesa dalla collina e ci chiude in trappola prima ancora di arrivare a Palermo.",
+          "debrief": "A Calatafimi Garibaldi non disponeva né di artiglieria moderna né di superiorità numerica. Rifiutò la ritirata perché vincere il primo scontro alla baionetta era indispensabile per spezzare il morale borbonico e accendere la rivolta generale dei contadini siciliani.",
+          "foldback": "decision_3"
+        },
+        {
+          "id": "insight_3",
+          "type": "insight",
+          "text": "Balzo in avanti sguainando la sciabola e trascinando i Mille su per le terrazze all'arma bianca. Non avevamo artiglieria moderna né superiorità numerica, ma l'urto alla baionetta nella ~evento~Battaglia di Calatafimi~ travolge il comando esitante di ~persona~Francesco Landi~, dimostra la vulnerabilità dell'esercito regio, solleva l'insurrezione dei contadini siciliani e spalanca la via verso Palermo.",
+          "next": "story_7"
+        },
+        {
+          "id": "story_7",
+          "type": "story",
+          "title": "Palermo in Fiamme (MACRO)",
+          "text": "Dal ~data~27 Maggio al 6 Giugno 1860~ entriamo a Palermo e la popolazione insorge alzando barricate in ogni vicolo. Le navi borboniche, il Palazzo dei Normanni e Castello a Mare rovesciano un bombardamento spietato sulla città, ma la resistenza piega le truppe regie fino all'armistizio firmato sulla nave dell'ammiraglio inglese ~persona~Rodney Mundy~. Mentre ordino a ~persona~Giacomo Medici~ di puntare su Messina e a Enrico Cosenz su Catania, nell'entroterra esplode però la fame di terra dei contadini.",
+          "next": "story_8"
+        },
+        {
+          "id": "story_8",
+          "type": "story",
+          "title": "La Scintilla di Bronte (MICRO)",
+          "text": "Quella ~nozione~fame di terra~ incendia i villaggi alle falde dell'Etna, lontana dal focolare domestico povero ma sereno dove le madri leggono le lettere dal campo ritratte dal pittore soldato ~persona~Gerolamo Induno~. A Bronte i braccianti assaltano le proprietà dei signori locali chiedendo subito la divisione dei feudi. ~persona~Nino Bixio~ entra nel mio comando con due battaglioni di Camicie Rosse pronti a marciare: «Generale, se l'isola cade nell'anarchia, i proprietari siciliani ci chiuderanno i rifornimenti per lo Stretto!».",
+          "next": "decision_4"
+        },
+        {
+          "id": "decision_4",
+          "type": "decision",
+          "decisionIndex": 3,
+          "text": "Mentre a Bronte bruciano le terre dei proprietari e le colonne attendono sulla costa di passare lo Stretto nell'estate del 1860, Nino Bixio aspetta con la mano sull'elsa il mio ordine immediato.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Invio Nino Bixio con due battaglioni a reprimere duramente i moti per garantire l'ordine politico e l'alleanza con la borghesia.",
+              "target": "insight_4"
+            },
+            {
+              "id": "b",
+              "text": "Appoggio l'occupazione violenta delle terre dei contadini per premiare la rivolta sociale contro i proprietari.",
+              "target": "paradox_4"
+            }
+          ]
+        },
+        {
+          "id": "paradox_4",
+          "type": "paradox",
+          "text": "I contadini festeggiano dividendosi persino gli orti delle caserme, mentre i borghesi siciliani fuggono chiudendo casse, muli e barche nei magazzini. Quando ~persona~Nino Bixio~ cerca una scialuppa per passare in Calabria, trova solo due asini che brucano i nostri piani di guerra.",
+          "debrief": "I contadini siciliani non combattevano tutti uniti per il Re di Sardegna, ma speravano nella redistribuzione delle terre. Per non perdere l'appoggio politico ed economico della borghesia isolana, ~persona~Nino Bixio~ represse duramente la rivolta di ~nozione~Bronte~ con due battaglioni di Camicie Rosse.",
+          "foldback": "decision_4"
+        },
+        {
+          "id": "insight_4",
+          "type": "insight",
+          "text": "Ordino a ~persona~Nino Bixio~ di ristabilire l'ordine a ~nozione~Bronte~ con pugno di ferro. È una pagina aspra: i contadini siciliani non combattevano tutti uniti per il Re di Sardegna, ma cercavano riscatto sociale; tuttavia, dopo la ~evento~Presa di Palermo~, sacrificare la rivolta agraria per l'alleanza con la borghesia locale ci garantisce il controllo dell'isola per sbarcare sul continente.",
+          "next": "story_9"
+        },
+        {
+          "id": "story_9",
+          "type": "story",
+          "title": "La Mossa di Cavour (MACRO)",
+          "text": "Tra ~data~Agosto e Settembre 1860~ varchiamo lo Stretto anche a bordo del piroscafo ~nozione~City of Aberdeen~, noleggiato con le sottoscrizioni del popolo scozzese che vede in me un nuovo William Wallace. Mentre Giacinto Albini solleva la Basilicata e io pernotto a Eboli in casa di Francesco La Francesca, a Torino ~persona~Camillo Benso, Conte di Cavour~ calcola come fermarmi prima di Roma per evitare lo scontro con Napoleone III. Cavour ordina così al generale Manfredo Fanti di invadere Marche e Umbria.",
+          "next": "story_10"
+        },
+        {
+          "id": "story_10",
+          "type": "story",
+          "title": "Dispacci da Castelfidardo (MICRO)",
+          "text": "La mappa delle ~nozione~Marche e dell'Umbria~ trema sul tavolo da campo mentre le truppe sabaude di ~persona~Manfredo Fanti~ sbaragliano l'esercito papale a Castelfidardo. I miei ufficiali repubblicani, fedeli all'insegnamento di ~persona~Giuseppe Mazzini~, battono il pugno sul legno: vogliono correre subito verso lo Stato Pontificio prima che Cavour ci sbarri la strada. Ma a nord di Napoli l'esercito borbonico si sta riorganizzando lungo il fiume Volturno per schiacciarci.",
+          "next": "decision_5"
+        },
+        {
+          "id": "decision_5",
+          "type": "decision",
+          "decisionIndex": 4,
+          "text": "Con l'esercito piemontese che viola i confini dello Stato Pontificio a Castelfidardo nel Settembre 1860 per tagliarci la via di Roma e i borbonici pronti al contrattacco, devo decidere subito la rotta.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Lascio sguarnito il fronte campano per correre su Roma prima dell'esercito di Manfredo Fanti.",
+              "target": "paradox_5"
+            },
+            {
+              "id": "b",
+              "text": "Accetto l'avanzata piemontese nelle Marche e in Umbria per saldare Nord e Sud e schiero le forze sul Volturno.",
+              "target": "insight_5"
+            }
+          ]
+        },
+        {
+          "id": "paradox_5",
+          "type": "paradox",
+          "text": "Corriamo verso Roma a tamburo battente, ma ci troviamo chiusi a panino tra le truppe francesi di Napoleone III e i soldati di ~persona~Camillo Benso, Conte di Cavour~. Nel frattempo ~persona~Francesco II di Borbone~ rientra a Napoli passeggiando indisturbato e si riprende il palazzo reale.",
+          "debrief": "Cavour e Garibaldi non agivano in perfetta intesa: il primo ministro piemontese invase le Marche e l'Umbria dello ~nozione~Stato Pontificio~ proprio per fermare la marcia garibaldina verso Roma, scongiurare l'intervento militare francese e mantenere la guida monarchica dell'unificazione.",
+          "foldback": "decision_5"
+        },
+        {
+          "id": "insight_5",
+          "type": "insight",
+          "text": "Fermo gli impazienti e consolido il fronte campano mentre i piemontesi scendono dalle ~nozione~Marche e dall'Umbria~. Io e ~persona~Camillo Benso, Conte di Cavour~ non agivamo affatto in perfetta armonia, ma la sua spregiudicata invasione dello Stato Pontificio a ~evento~Castelfidardo~ impedisce l'intervento francese e ricongiunge finalmente il Nord e il Sud della penisola.",
+          "next": "story_11"
+        },
+        {
+          "id": "story_11",
+          "type": "story",
+          "title": "L'Urto del Volturno (MACRO)",
+          "text": "Tra l'~data~1 e il 2 Ottobre 1860~ ventottomila soldati di ~persona~Francesco II di Borbone~ lanciano l'offensiva decisiva nella ~evento~Battaglia del Volturno~. Sventolano la nuova bandiera tricolore delle Due Sicilie con lo stemma borbonico sul bianco, estremo tentativo del giovane sovrano prima di chiudersi nella fortezza di Gaeta. Con l'aiuto di comandanti come István Türr, il nostro Esercito Meridionale resiste e spezza l'urto regio, mentre da nord scende l'armata di Vittorio Emanuele II.",
+          "next": "story_12"
+        },
+        {
+          "id": "story_12",
+          "type": "story",
+          "title": "Polvere sulla Via di Teano (MICRO)",
+          "text": "Quella ~nozione~bandiera con lo stemma borbonico~ giace piegata nel fango quando, all'alba del ~data~26 Ottobre 1860~, il rullo dei tamburi piemontesi risuona lungo la strada di Teano. I miei volontari, logori e stanchi, stringono i fucili guardando con diffidenza le colonne regolari del Nord: i repubblicani mazziniani mi implorano di non cedere il governo del Sud conquistato in battaglia. Dal polverone avanza a cavallo ~persona~Vittorio Emanuele II~ nella sua alta uniforme reale.",
+          "next": "decision_6"
+        },
+        {
+          "id": "decision_6",
+          "type": "decision",
+          "decisionIndex": 5,
+          "text": "Quando Vittorio Emanuele II ferma il cavallo davanti alla mia camicia rossa sulla strada di Teano il 26 Ottobre 1860, mentre i repubblicani di Giuseppe Mazzini trattengono il fiato, una mia parola decide il destino d'Italia.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Mi tolgo il cappello, saluto Vittorio Emanuele II come Re d'Italia e gli consegno tutto il Regno conquistato.",
+              "target": "insight_6"
+            },
+            {
+              "id": "b",
+              "text": "Rifiuto di cedere il Mezzogiorno alla Corona e proclamo a Napoli la repubblica democratica mazziniana.",
+              "target": "paradox_6"
+            }
+          ]
+        },
+        {
+          "id": "paradox_6",
+          "type": "paradox",
+          "text": "La proclamazione della repubblica spacca l'Italia in due eserciti fratelli pronti a spararsi addosso lungo la strada di ~evento~Teano~. ~persona~Vittorio Emanuele II~ ordina alle truppe regolari di marciare contro le Camicie Rosse, mentre ~persona~Francesco II di Borbone~ approfitta della guerra civile dalla fortezza di Gaeta per riconquistare il trono.",
+          "debrief": "Pur provenendo dagli ambienti repubblicani e democratici, Garibaldi non pretese il governo del Sud dopo le sue vittorie: scelse di consegnare tutte le conquiste a Vittorio Emanuele II a Teano per evitare una guerra civile tra italiani e garantire la nascita dello Stato unitario.",
+          "foldback": "decision_6"
+        },
+        {
+          "id": "insight_6",
+          "type": "insight",
+          "text": "Stringo la mano a ~persona~Vittorio Emanuele II~ nell'~evento~Incontro di Teano~ e consegno un intero regno senza pretendere troni o poteri. Pur legato agli ideali democratici di ~persona~Giuseppe Mazzini~, scelgo di sottomettere la rivoluzione alla monarchia costituzionale: questo sacrificio politico evita una sanguinosa guerra civile e rende possibile la nascita dello Stato unitario.",
+          "next": "story_13"
+        },
+        {
+          "id": "story_13",
+          "type": "story",
+          "title": "La Corona e le Catene (MACRO)",
+          "text": "Mentre a Torino si prepara per il ~data~17 Marzo 1861~ la proclamazione ufficiale del Regno d'Italia sotto le leggi dello ~nozione~Statuto Albertino~, nel Mezzogiorno emergono profonde fratture. Ai soldati sconfitti di ~persona~Francesco II di Borbone~ viene imposto il giuramento di fedeltà al nuovo Re, ma oltre mille prigionieri rifiutano per onore verso la propria bandiera. Nelle campagne lucane e campane, intanto, ex soldati e contadini guidati da Carmine Crocco scelgono la via delle montagne.",
+          "next": "story_14"
+        },
+        {
+          "id": "story_14",
+          "type": "story",
+          "title": "Il Giuramento dei Vinti (MICRO)",
+          "text": "Il freddo delle montagne annuncia la tempesta del ~nozione~brigantaggio~ guidato da ~persona~Carmine Crocco~. Nel cortile della caserma, file di ex soldati borbonici restano immobili davanti agli ufficiali sabaudi: hanno il volto scavato, ma tengono le braccia incrociate rifiutando di indossare la divisa di ~persona~Vittorio Emanuele II~. I comandi piemontesi sono pronti a deportare chi non giura nelle gelide prigioni alpine del Forte di Fenestrelle per impedire che alimentino la rivolta armata nel Sud.",
+          "next": "decision_7"
+        },
+        {
+          "id": "decision_7",
+          "type": "decision",
+          "decisionIndex": 6,
+          "text": "Alla vigilia del 17 Marzo 1861, mentre i soldati borbonici rifiutano il giuramento e Carmine Crocco infiamma le campagne, il passaggio dei poteri alle dure leggi del nuovo Regno conduce i ribelli verso il Forte di Fenestrelle.",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Impedisco l'applicazione delle regole sabaude e rimando subito a casa i soldati borbonici armati senza alcun giuramento.",
+              "target": "paradox_7"
+            },
+            {
+              "id": "b",
+              "text": "Lascio che il nuovo Stato applichi lo Statuto Albertino e il giuramento regio, pur sapendo il prezzo della deportazione a Fenestrelle.",
+              "target": "insight_7"
+            }
+          ]
+        },
+        {
+          "id": "paradox_7",
+          "type": "paradox",
+          "text": "I soldati borbonici ringraziano per il permesso premio, fanno le valigie con i fucili carichi e vanno dritti nei boschi a ingrossare le bande di ~persona~Carmine Crocco~. In tre giorni ~persona~Vittorio Emanuele II~ si ritrova un nuovo esercito regio accampato sotto le finestre di Napoli.",
+          "debrief": "L'arrivo dei piemontesi non fu accolto da una festa unanime in tutto il Sud: 1.186 ex soldati borbonici che rifiutarono di prestare giuramento al nuovo Re furono deportati nel ~nozione~Forte di Fenestrelle~, mentre nelle campagne meridionali esplodeva la rivolta del brigantaggio.",
+          "foldback": "decision_7"
+        },
+        {
+          "id": "insight_7",
+          "type": "insight",
+          "text": "Il nuovo Regno impone la sua dura legge: i millecentottantasei soldati borbonici che rifiutano il giuramento regio per fedeltà a ~persona~Francesco II di Borbone~ vengono deportati al ~nozione~Forte di Fenestrelle~, mentre nel Sud divampa il brigantaggio di ~persona~Carmine Crocco~. L'unificazione nazionale non fu una festa unanime, ma un processo complesso segnato da ferite profonde.",
+          "next": "epilogue"
+        },
+        {
+          "id": "epilogue",
+          "type": "epilogue",
+          "title": "L'Italia è Fatta",
+          "text": "Il ~data~17 Marzo 1861~ a Torino ~persona~Vittorio Emanuele II~ proclama il nuovo Regno d'Italia estendendo le leggi dello Statuto Albertino a tutta la penisola. Mentre Francesco II difende i suoi diritti dinastici dall'esilio, i nostri milleottantanove volontari rientrano alle loro case. Come nei dipinti del pittore patriota ~persona~Gerolamo Induno~, dove una donna dal mantello ricamato prende sottobraccio il marinaio reduce mentre sullo sfondo sereno brillano le guglie del Duomo di Milano, l'impresa dei Mille è compiuta."
+        }
+      ]
+    };
+
+    const CHARACTER_SHEETS = {
+      "Giuseppe Garibaldi": {
+        chi: "Comandante supremo della Spedizione dei Mille.",
+        vuole: "Unificare l'Italia sotto la corona di Vittorio Emanuele II.",
+        costa: "Paura della guerra civile; limite della scarsità di munizioni e fucili obsoleti.",
+        riconosci: "Camicia rossa indosso e atteggiamento schietto al bivacco dei soldati."
+      },
+      "Giuseppe Marchetti": {
+        chi: "Volontario giovanissimo di 10 anni originario di Chioggia.",
+        vuole: "Combattere per l'Italia unita accanto al padre medico Luigi e scaricare le munizioni.",
+        costa: "Paura di annegare al buio o delle cannonate regie; limite dei suoi soli 10 anni di età.",
+        riconosci: "Camicia rossa di taglia grande indossata sopra i pantaloni consumati."
+      },
+      "Nino Bixio": {
+        chi: "Comandante del piroscafo Lombardo e braccio destro del Generale.",
+        vuole: "Guidare le truppe in battaglia e mantenere una disciplina ferrea.",
+        costa: "Paura del disastro navale e dell'anarchia nei villaggi; limite dell'impulsività e della durezza spietata.",
+        riconosci: "Presenza severa sul ponte di comando o alla testa dei battaglioni a Bronte."
+      },
+      "Vittorio Emanuele II": {
+        chi: "Re di Sardegna e futuro primo Re d'Italia unita.",
+        vuole: "Estendere il proprio Regno e lo Statuto Albertino sull'intera penisola.",
+        costa: "Paura della reazione delle potenze straniere e dell'eversione repubblicana; limite della diffidenza verso i democratici.",
+        riconosci: "Uniforme reale da alto ufficiale nell'incontro stradale a Teano."
+      },
+      "Camillo Benso, Conte di Cavour": {
+        chi: "Primo Ministro del Regno di Piemonte-Sardegna e stratega politico.",
+        vuole: "Controllare il processo unitario e fermare Garibaldi prima di Roma evitando il conflitto con la Francia.",
+        costa: "Paura dell'intervento di Napoleone III; limite dei vincoli diplomatici europei.",
+        riconosci: "Abito da statista piemontese in continuo lavoro diplomatico a Torino."
+      },
+      "Francesco II di Borbone": {
+        chi: "Giovane sovrano del Regno delle Due Sicilie salito al trono nel 1859.",
+        vuole: "Difendere la propria corona, il trono borbonico e l'indipendenza del Sud.",
+        costa: "Paura del tradimento dei generali e dell'oblio del regno; limite dell'isolamento diplomatico e della perdita dell'esercito.",
+        riconosci: "Ritratto regale isolato prima del rifugio nella fortezza di Gaeta."
+      },
+      "Luigi Marchetti": {
+        chi: "Medico patriota di Chioggia e padre del giovane Giuseppe.",
+        vuole: "Prestare soccorso sanitario ai volontari e proteggere il proprio figlio.",
+        costa: "Paura dell'esplosione del materiale sanitario; limite di essere un medico disarmato sotto il tiro navale.",
+        riconosci: "Borsa medica al fianco accanto al figlio decenne sul molo di Marsala."
+      },
+      "Francesco Landi": {
+        chi: "Generale dell'esercito regolare borbonico a difesa di Calatafimi.",
+        vuole: "Respingere l'avanzata dei garibaldini dalle colline siciliane.",
+        costa: "Paura della rivolta popolare alle spalle; limite di un comando esitante.",
+        riconosci: "Schieramento in posizione rialzata sulle terrazze collinari di Calatafimi."
+      },
+      "Giuseppe La Masa": {
+        chi: "Patriota siciliano e comandante dei Cacciatori dell'Etna.",
+        vuole: "Guidare i 500 insorti siciliani a sostegno dei Mille.",
+        costa: "Paura della rotta degli insorti; limite di guidare volontari indisciplinati.",
+        riconosci: "Alla testa delle squadre di insorti siciliani sui pendii di Calatafimi."
+      },
+      "Rodney Mundy": {
+        chi: "Ammiraglio della Marina britannica nelle acque di Palermo.",
+        vuole: "Mediare l'armistizio tra i borbonici e le forze garibaldine.",
+        costa: "Paura di vittime tra i civili; limite del dovere diplomatico di neutralità.",
+        riconosci: "Ponte della nave ammiraglia inglese dove viene firmato l'armistizio di Palermo."
+      },
+      "Giacomo Medici": {
+        chi: "Generale garibaldino e comandante della colonna di rinforzi.",
+        vuole: "Avanzare verso Messina e conquistare le fortezze borboniche nella Sicilia orientale.",
+        costa: "Resistenza delle piazzeforti regie lungo la marcia verso lo Stretto.",
+        riconosci: "Alla guida delle colonne garibaldine dirette verso Messina."
+      },
+      "Gerolamo Induno": {
+        chi: "Pittore soldato, fervente patriota e veterano delle campagne risorgimentali.",
+        vuole: "Raccontare la guerra e l'intimità dei familiari attraverso la pittura realista.",
+        costa: "Durezza della vita al campo e ferite delle campagne militari.",
+        riconosci: "Dipinti con il focolare domestico, la donna dal mantello ricamato e le guglie del Duomo di Milano."
+      },
+      "Manfredo Fanti": {
+        chi: "Generale alla guida della spedizione dell'esercito regio piemontese.",
+        vuole: "Condurre la campagna rapida nelle Marche e in Umbria fino a Castelfidardo.",
+        costa: "Paura dello stallo militare; limite della dipendenza dai comandi regii.",
+        riconosci: "Uniforme dell'esercito regolare sabaudo in marcia verso Castelfidardo."
+      },
+      "Giuseppe Mazzini": {
+        chi: "Pensatore e guida del movimento repubblicano e democratico italiano.",
+        vuole: "L'unificazione d'Italia come repubblica democratica attraverso l'insurrezione popolare.",
+        costa: "Scontro politico con la monarchia sabauda e la diplomazia di Cavour.",
+        riconosci: "Ispiratore degli ufficiali repubblicani e di patrioti come Crispi e Pilo."
+      },
+      "Carmine Crocco": {
+        chi: "Ex soldato e capo delle bande di insorti nel Mezzogiorno.",
+        vuole: "Opporsi all'invasione piemontese guidando la rivolta armata nelle campagne.",
+        costa: "Paura della cattura e del carcere; limite della scelta della clandestinità e del brigantaggio.",
+        riconosci: "Alla guida delle bande armate a cavallo tra i boschi e le montagne del Sud."
+      }
+    };
+
+    const TOTAL_BIVIS = 7;
+    const STORAGE_RESULTS_KEY = "garibaldi_mille_results_v2";
+    const STORAGE_NODE_KEY = "garibaldi_mille_node_v2";
+
+    // Results tracking: array of 7 items ('green', 'yellow', 'red', null)
+    let decisionResults = loadResults();
+
+    function loadResults() {
+      try {
+        const saved = localStorage.getItem(STORAGE_RESULTS_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (_) {}
+      return new Array(TOTAL_BIVIS).fill(null);
+    }
+
+    function saveResults() {
+      try {
+        localStorage.setItem(STORAGE_RESULTS_KEY, JSON.stringify(decisionResults));
+      } catch (_) {}
+    }
+
+    const NODE_MAP = {};
+    GAME_DATA.nodes.forEach(n => { NODE_MAP[n.id] = n; });
+
+    const appCard = document.getElementById("app-card");
+    const overlay = document.getElementById("persona-overlay");
+    const personaTitle = document.getElementById("persona-title");
+    const personaBody = document.getElementById("persona-body");
+    const personaCloseBtn = document.getElementById("persona-close-btn");
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function parseFormattedText(rawText) {
+      if (!rawText) return "";
+      const escaped = escapeHtml(rawText);
+      return escaped.replace(/~(data|nozione|evento|persona)~([^~]+)~/g, (_, type, content) => {
+        if (type === "persona") {
+          return '<span class="hl-persona" role="button" tabindex="0" data-persona="' + content + '">' + content + '</span>';
+        }
+        return '<span class="hl-gold">' + content + '</span>';
+      });
+    }
+
+    function openPersonaModal(name) {
+      const sheet = CHARACTER_SHEETS[name] || {
+        chi: "Protagonista storico delle vicende del 1860-1861.",
+        vuole: "Realizzare i propri obiettivi nella campagna per l'unificazione.",
+        costa: "Rischi militari e politici del conflitto risorgimentale.",
+        riconosci: "Citato nelle cronache storiche della Spedizione dei Mille."
+      };
+      personaTitle.textContent = name;
+      personaBody.innerHTML =
+        '<div class="persona-field">' +
+          '<div class="persona-label">Chi è</div>' +
+          '<div class="persona-value">' + escapeHtml(sheet.chi) + '</div>' +
+        '</div>' +
+        '<div class="persona-field">' +
+          '<div class="persona-label">Cosa vuole</div>' +
+          '<div class="persona-value">' + escapeHtml(sheet.vuole) + '</div>' +
+        '</div>' +
+        '<div class="persona-field">' +
+          '<div class="persona-label">Cosa gli costa</div>' +
+          '<div class="persona-value">' + escapeHtml(sheet.costa) + '</div>' +
+        '</div>' +
+        '<div class="persona-field">' +
+          '<div class="persona-label">Lo riconosci da</div>' +
+          '<div class="persona-value">' + escapeHtml(sheet.riconosci) + '</div>' +
+        '</div>';
+      overlay.classList.add("active");
+    }
+
+    function closePersonaModal() { overlay.classList.remove("active"); }
+
+    personaCloseBtn.addEventListener("click", closePersonaModal);
+    overlay.addEventListener("click", e => { if (e.target === overlay) closePersonaModal(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closePersonaModal(); });
+
+    appCard.addEventListener("click", e => {
+      const personaEl = e.target.closest(".hl-persona");
+      if (personaEl) {
+        openPersonaModal(personaEl.getAttribute("data-persona"));
+        return;
+      }
+      const navBtn = e.target.closest("[data-target]");
+      if (navBtn) {
+        const targetId = navBtn.getAttribute("data-target");
+        if (targetId && NODE_MAP[targetId]) {
+          handleNavigation(targetId);
+        }
+      }
+    });
+
+    function handleNavigation(targetId) {
+      const targetNode = NODE_MAP[targetId];
+      // If we are coming from a paradox (retry), record red if first time failing, or upgrade/keep yellow
+      const currentNode = getCurrentNode();
+      if (currentNode && currentNode.type === "paradox") {
+        const decisionId = currentNode.foldback;
+        const decNode = NODE_MAP[decisionId];
+        if (decNode && typeof decNode.decisionIndex === "number") {
+          const idx = decNode.decisionIndex;
+          if (decisionResults[idx] === null || decisionResults[idx] === 'red') {
+            decisionResults[idx] = 'yellow'; // failed 1st try, now retrying
+          } else if (decisionResults[idx] !== 'yellow') {
+            decisionResults[idx] = 'yellow';
+          }
+          saveResults();
+        }
+      } else if (currentNode && currentNode.type === "decision") {
+        // If clicking choice A (paradox), record red initially if null
+        const choice = currentNode.choices.find(c => c.target === targetId);
+        if (choice && targetId.startsWith("paradox")) {
+          const idx = currentNode.decisionIndex;
+          if (decisionResults[idx] === null) {
+            decisionResults[idx] = 'red';
+            saveResults();
+          }
+        } else if (choice && targetId.startsWith("insight")) {
+          const idx = currentNode.decisionIndex;
+          if (decisionResults[idx] === null) {
+            decisionResults[idx] = 'green'; // 1st try correct!
+            saveResults();
+          }
+        }
+      }
+      renderNode(targetId);
+    }
+
+    let activeNodeId = "intro";
+    function getCurrentNode() { return NODE_MAP[activeNodeId]; }
+
+    function renderThread(activeDecisionIdx) {
+      let html = '<div class="thread-container">';
+      for (let i = 0; i < TOTAL_BIVIS; i++) {
+        let statusClass = "";
+        const res = decisionResults[i];
+        if (res === 'green') statusClass = "status-green";
+        else if (res === 'yellow') statusClass = "status-yellow";
+        else if (res === 'red') statusClass = "status-red";
+
+        let currentClass = (i === activeDecisionIdx) ? "current" : "";
+        html += '<div class="thread-dot ' + statusClass + ' ' + currentClass + '">' + (i + 1) + '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function renderNode(nodeId) {
+      activeNodeId = nodeId;
+      const node = NODE_MAP[nodeId] || NODE_MAP["intro"];
+      try { localStorage.setItem(STORAGE_NODE_KEY, node.id); } catch (_) {}
+
+      appCard.className = "game-card";
+      let html = "";
+
+      // Determine active decision index for thread
+      let currentBiviIdx = -1;
+      if (node.type === "decision") currentBiviIdx = node.decisionIndex;
+      else if (node.type === "paradox") {
+        const decNode = NODE_MAP[node.foldback];
+        if (decNode) currentBiviIdx = decNode.decisionIndex;
+      } else if (node.type === "insight") {
+        // find previous decision
+        // Approximate based on flow or search backward
+        currentBiviIdx = getBiviIndexForNode(nodeId);
+      } else {
+        currentBiviIdx = getBiviIndexForNode(nodeId);
+      }
+
+      html += renderThread(currentBiviIdx);
+
+      if (node.type === "intro") {
+        appCard.classList.add("theme-story");
+        html += '<div class="badge badge-story">Premessa Storica</div>';
+        html += '<div class="hero-image-box">';
+        // Garibaldi historical portrait placeholder / image representation
+        html += '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Giuseppe_Garibaldi_by_Gustave_Le_Gray%2C_1860s.jpg/800px-Giuseppe_Garibaldi_by_Gustave_Le_Gray%2C_1860s.jpg" alt="Giuseppe Garibaldi">';
+        html += '</div>';
+        if (node.title) html += '<h2 class="node-title">' + escapeHtml(node.title) + '</h2>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+        html += '<button type="button" class="btn-icon-next" data-target="' + escapeHtml(node.next) + '" aria-label="Continua"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
+      } else if (node.type === "story") {
+        html += '<div class="badge badge-story">Capitolo Storico</div>';
+        if (node.title) html += '<h2 class="node-title">' + escapeHtml(node.title) + '</h2>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+        html += '<button type="button" class="btn-icon-next" data-target="' + escapeHtml(node.next) + '" aria-label="Continua"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
+      } else if (node.type === "decision") {
+        html += '<div class="badge badge-decision">Scelta Decisiva</div>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+        html += '<div class="choices-list">';
+        node.choices.forEach((choice, idx) => {
+          const label = choice.id.toUpperCase();
+          const themeClass = (idx === 0) ? "option-a" : "option-b";
+          html +=
+            '<button type="button" class="btn-choice ' + themeClass + '" data-target="' + escapeHtml(choice.target) + '">' +
+              '<span class="choice-key">[' + escapeHtml(label) + ']</span>' +
+              '<span>' + escapeHtml(choice.text) + '</span>' +
+            '</button>';
+        });
+        html += '</div>';
+      } else if (node.type === "paradox") {
+        appCard.classList.add("theme-paradox");
+        html += '<div class="badge badge-paradox">Scelta da rivedere</div>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+        html +=
+          '<div class="debrief-box">' +
+            '<div class="debrief-title">Cos\'è successo davvero nella Storia?</div>' +
+            '<div class="debrief-text">' + parseFormattedText(node.debrief) + '</div>' +
+          '</div>';
+        html += '<button type="button" class="btn-icon-next" data-target="' + escapeHtml(node.foldback) + '" aria-label="Riprova"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>';
+      } else if (node.type === "insight") {
+        appCard.classList.add("theme-insight");
+        html += '<div class="badge badge-insight">Scelta Giusta</div>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+        html += '<button type="button" class="btn-icon-next" data-target="' + escapeHtml(node.next) + '" aria-label="Continua"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
+      } else if (node.type === "epilogue") {
+        html += '<div class="badge badge-epilogue">Epilogo Storico</div>';
+        if (node.title) html += '<h2 class="node-title">' + escapeHtml(node.title) + '</h2>';
+        html += '<div class="node-text">' + parseFormattedText(node.text) + '</div>';
+      }
+
+      appCard.innerHTML = html;
+      window.scrollTo(0, 0);
+    }
+
+    function getBiviIndexForNode(nodeId) {
+      // Helper to map current node to bivi index for thread display
+      const mapping = {
+        "intro": 0, "story_1": 0, "story_2": 0,
+        "story_3": 1, "story_4": 1,
+        "story_5": 2, "story_6": 2,
+        "story_7": 3, "story_8": 3,
+        "story_9": 4, "story_10": 4,
+        "story_11": 5, "story_12": 5,
+        "story_13": 6, "story_14": 6, "epilogue": 6
+      };
+      return mapping[nodeId] !== undefined ? mapping[nodeId] : 0;
+    }
+
+    // Init storage recovery or default
+    function initApp() {
+      let savedNode = "intro";
+      try {
+        const s = localStorage.getItem(STORAGE_NODE_KEY);
+        if (s && NODE_MAP[s]) savedNode = s;
+      } catch (_) {}
+      renderNode(savedNode);
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
